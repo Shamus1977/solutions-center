@@ -1,10 +1,15 @@
 import React, {useState} from 'react';
 import {toast} from "react-toastify";
 import { useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { registerUser } from '../features/auth/authSlice';
 
 const RegisterUser = () => {
 
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    const { isLoading } = useSelector((state) => state.auth);
 
     const [userData, setUserData] = useState({
         userName: "",
@@ -28,16 +33,29 @@ const RegisterUser = () => {
         e.preventDefault();
         if(password !== password2){
             return toast.error("Passwords must match.");
+        }else{
+            const user = {
+                userName,
+                email,
+                password,
+            }
+            dispatch(registerUser(user))
+                .unwrap()
+                .then((user) => {
+                    toast.success(`You are now registered ${user.userName}!`);
+                    setUserData({
+                        userName: "",
+                        email: "",
+                        password: "",
+                        password2: "",
+                    });
+                    navigate("/");
+                })
+                .catch(toast.error);
         }
-        console.log(userData);
-        setUserData({
-            userName: "",
-            email: "",
-            password: "",
-            password2: "",
-        });
-        navigate("/");
     }
+
+    if(isLoading) return <h2 className='text-center mt-5'>Loading...</h2>
     return (
         <>
             <h2 className='text-center'>Please Register.</h2>

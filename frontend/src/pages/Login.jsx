@@ -1,9 +1,14 @@
 import React, {useState} from 'react';
-//import {toast} from "react-toastify";
+import {toast} from "react-toastify";
 import { useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { login } from '../features/auth/authSlice';
 
 const Login = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    const { isLoading } = useSelector((state) => state.auth);
 
     const [userData, setUserData] = useState({
         email: "",
@@ -23,13 +28,25 @@ const Login = () => {
 
     const onSubmit = (e) => {
         e.preventDefault();
-        console.log(userData);
-        setUserData({
-            email: "",
-            password: "",
-        });
-        navigate("/");
+        const user = {
+            email,
+            password,
+        }
+        dispatch(login(user))
+        .unwrap()
+        .then((user) => {
+            toast.success(`You are now logged in ${user.userName}!`);
+            setUserData({
+                email: "",
+                password: "",
+            });
+            navigate("/");
+        })
+        .catch(toast.error);
     }
+
+    if(isLoading) return <h2 className='text-center mt-5' >Loading...</h2>;
+    
     return (
         <>
             <h2 className='text-center'>Please Login.</h2>
