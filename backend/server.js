@@ -22,8 +22,10 @@ app.get("/", (req, res) => {
 
 //Routes
 const userRoutes = require("./routes/userRoutes");
+const issueRoutes = require("./routes/issueRoutes");
 
 app.use("/api/users", userRoutes);
+app.use("/api/issues", issueRoutes);
 
 app.use(errorHandler);
 
